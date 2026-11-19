@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/gpio/gct,gdm7243-gpio.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: GCT GDM7243 application-CPU banked GPIO controller
+
+maintainers:
+  - codeandsolder <codeandsolder@gmail.com>
+
+description: |
+  A set of 32-bit GPIO banks with direction at 0xfc002080 + bank*4
+  and input/output data at 0xfc0020c0 + bank*4. The vendor kernel
+  represents each pin as (bank << 8) | bit, with bit in [0, 31].
+  Modern Linux uses contiguous GPIO offsets bank*32 + bit instead.
+  The direction/data arrays can address at most 16 banks before
+  the next register group. The vendor GPIO interrupt helpers support
+  only banks 0 through 6; this binding controls GPIO data access only.
+
+properties:
+  compatible:
+    const: gct,gdm7243-gpio
+
+  reg:
+    maxItems: 1
+
+  gpio-controller: true
+
+  '#gpio-cells':
+    const: 2
+
+  ngpios:
+    minimum: 1
+    maximum: 512
+    description: >
+      Number of populated GPIO lines, including any reserved holes.
+      The physical pins and absent lines must be determined by board
+      pad/pinmux data.
+
+required:
+  - compatible
+  - reg
+  - gpio-controller
+  - '#gpio-cells'
+  - ngpios
+
+allOf:
+  - $ref: /schemas/gpio/gpio.yaml#
+
+unevaluatedProperties: false
+
+examples:
+  - |
+    gpio@fc002080 {
+        compatible = "gct,gdm7243-gpio";
+        reg = <0xfc002080 0x80>;
+        gpio-controller;
+        #gpio-cells = <2>;
+        ngpios = <224>;
+    };
+...
