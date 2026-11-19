@@ -1,0 +1,29 @@
+diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
+--- a/drivers/gpio/Kconfig
++++ b/drivers/gpio/Kconfig
+@@ -293,6 +293,14 @@
+ 	  Selecting this option will enable handling of GPIO pins present
+ 	  on Exar XR17V352/354/358 chips.
+ 
++config GPIO_GDM7243
++	tristate "GCT GDM7243 banked GPIO controller"
++	depends on OF_GPIO
++	help
++	  GPIO controller for GCT GDM7243 family LTE SoCs.
++	  Provides 32-bit GPIO banks and standard gpiolib direction,
++	  input and output functionality.
++
+ config GPIO_GE_FPGA
+ 	bool "GE FPGA based GPIO"
+ 	depends on GE_FPGA || COMPILE_TEST
+diff --git a/drivers/gpio/Makefile b/drivers/gpio/Makefile
+--- a/drivers/gpio/Makefile
++++ b/drivers/gpio/Makefile
+@@ -66,6 +66,7 @@
+ obj-$(CONFIG_GPIO_F7188X)		+= gpio-f7188x.o
+ obj-$(CONFIG_GPIO_FTGPIO010)		+= gpio-ftgpio010.o
+ obj-$(CONFIG_GPIO_FXL6408)		+= gpio-fxl6408.o
++obj-$(CONFIG_GPIO_GDM7243)		+= gpio-gdm7243.o
+ obj-$(CONFIG_GPIO_GE_FPGA)		+= gpio-ge.o
+ obj-$(CONFIG_GPIO_GPIO_MM)		+= gpio-gpio-mm.o
+ obj-$(CONFIG_GPIO_GRANITERAPIDS)	+= gpio-graniterapids.o

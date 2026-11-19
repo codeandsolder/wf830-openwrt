@@ -38,17 +38,29 @@ cp -a "$overlay/files/." "$scratch/"
 
 make -s -j4 -C "$scratch" O="$output" ARCH=arm LLVM=1 \
     CC="/usr/local/bin/sccache clang" multi_v7_defconfig
-"$scratch/scripts/config" --file "$output/.config" \
-    -e GDM7243_IRQCHIP -e GDM7243_RTCCS \
-    -e SERIAL_GDM7243_EARLYCON
+# Derive enabled options and object targets from the overlay, so this
+# harness automatically includes each newly ported GCT driver.
+mapfile -t configs < <(
+    rg -o --no-filename '^config [A-Z0-9_]*GDM7243[A-Z0-9_]*' \
+        "$scratch/drivers" -g Kconfig | cut -d ' ' -f 2 | sort -u
+)
+config_args=()
+for symbol in "${configs[@]}"; do
+    config_args+=(-e "$symbol")
+done
+"$scratch/scripts/config" --file "$output/.config" "${config_args[@]}"
 make -s -j4 -C "$scratch" O="$output" ARCH=arm LLVM=1 \
     CC="/usr/local/bin/sccache clang" olddefconfig
-rg '^CONFIG_(GDM7243_(IRQCHIP|RTCCS)|SERIAL_GDM7243_EARLYCON)=' "$output/.config"
+rg '^CONFIG_[A-Z0-9_]*GDM7243' "$output/.config"
+
+objects=()
+while IFS= read -r -d '' source; do
+    rel="${source#"$overlay/files/"}"
+    objects+=("${rel%.c}.o")
+done < <(find "$overlay/files/drivers" -type f -name '*.c' -print0 | sort -z)
+(( ${#objects[@]} > 0 )) || { echo "No drivers in overlay" >&2; exit 1; }
 make -s -j4 -C "$scratch" O="$output" ARCH=arm LLVM=1 \
-    CC="/usr/local/bin/sccache clang" W=1 \
-    drivers/irqchip/irq-gdm7243.o \
-    drivers/clocksource/gdm7243-rtccs.o \
-    drivers/tty/serial/gdm7243-earlycon.o
-file "$output/drivers/irqchip/irq-gdm7243.o" \
-     "$output/drivers/clocksource/gdm7243-rtccs.o" \
-     "$output/drivers/tty/serial/gdm7243-earlycon.o"
+    CC="/usr/local/bin/sccache clang" W=1 "${objects[@]}"
+for object in "${objects[@]}"; do
+    file "$output/$object"
+done
