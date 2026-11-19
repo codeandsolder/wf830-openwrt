@@ -1,0 +1,29 @@
+diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
+--- a/drivers/tty/serial/Kconfig
++++ b/drivers/tty/serial/Kconfig
+@@ -5,6 +5,14 @@
+ 
+ menu "Serial drivers"
+ 	depends on HAS_IOMEM
++
++config SERIAL_GDM7243_EARLYCON
++	bool "GCT GDM7243 early UART console"
++	depends on ARM && OF && SERIAL_CORE_CONSOLE
++	select SERIAL_EARLYCON
++	help
++	  Polling serial console using UART0-2 as initialized by
++	  the bootloader on GCT GDM7243 family LTE SoCs.
+ 
+ config SERIAL_EARLYCON
+ 	bool
+diff --git a/drivers/tty/serial/Makefile b/drivers/tty/serial/Makefile
+--- a/drivers/tty/serial/Makefile
++++ b/drivers/tty/serial/Makefile
+@@ -6,6 +6,7 @@
+ obj-$(CONFIG_SERIAL_CORE) += serial_base.o
+ serial_base-y := serial_core.o serial_base_bus.o serial_ctrl.o serial_port.o
+ 
++obj-$(CONFIG_SERIAL_GDM7243_EARLYCON) += gdm7243-earlycon.o
+ obj-$(CONFIG_SERIAL_EARLYCON) += earlycon.o
+ obj-$(CONFIG_SERIAL_EARLYCON_SEMIHOST) += earlycon-semihost.o
+ obj-$(CONFIG_SERIAL_EARLYCON_RISCV_SBI) += earlycon-riscv-sbi.o

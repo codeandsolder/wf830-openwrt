@@ -34,11 +34,14 @@ sanitized hardware notes belong in this repository.
 - `drivers/clocksource/gdm7243-rtccs.c`: free-running 32.768 kHz
   RTC clocksource and scheduler clock, recovered from the live P4 kernel.
   Static recovery complete, hardware test pending.
-- Next: periodic clockevent (IRQ 18), serial console, then GIPC/GLIF,
+- `drivers/tty/serial/gdm7243-earlycon.c`: polling boot-console
+  output using the recovered UART0-2 register layout.
+- Next: periodic clockevent and full UART/clock control, then GIPC/GLIF,
   NAND/ECC and Ethernet.
 
 See [IRQ controller recovery](docs/irqchip.md) and
-[RTC clocksource recovery](docs/clocksource.md).
+[RTC clocksource recovery](docs/clocksource.md), and
+[UART early-console recovery](docs/earlycon.md).
 
 ## Repeatable compiler validation
 
