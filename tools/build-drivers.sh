@@ -39,13 +39,16 @@ cp -a "$overlay/files/." "$scratch/"
 make -s -j4 -C "$scratch" O="$output" ARCH=arm LLVM=1 \
     CC="/usr/local/bin/sccache clang" multi_v7_defconfig
 "$scratch/scripts/config" --file "$output/.config" \
-    -e GDM7243_IRQCHIP -e GDM7243_RTCCS
+    -e GDM7243_IRQCHIP -e GDM7243_RTCCS \
+    -e SERIAL_GDM7243_EARLYCON
 make -s -j4 -C "$scratch" O="$output" ARCH=arm LLVM=1 \
     CC="/usr/local/bin/sccache clang" olddefconfig
-rg '^CONFIG_GDM7243_(IRQCHIP|RTCCS)=' "$output/.config"
+rg '^CONFIG_(GDM7243_(IRQCHIP|RTCCS)|SERIAL_GDM7243_EARLYCON)=' "$output/.config"
 make -s -j4 -C "$scratch" O="$output" ARCH=arm LLVM=1 \
     CC="/usr/local/bin/sccache clang" W=1 \
     drivers/irqchip/irq-gdm7243.o \
-    drivers/clocksource/gdm7243-rtccs.o
+    drivers/clocksource/gdm7243-rtccs.o \
+    drivers/tty/serial/gdm7243-earlycon.o
 file "$output/drivers/irqchip/irq-gdm7243.o" \
-     "$output/drivers/clocksource/gdm7243-rtccs.o"
+     "$output/drivers/clocksource/gdm7243-rtccs.o" \
+     "$output/drivers/tty/serial/gdm7243-earlycon.o"

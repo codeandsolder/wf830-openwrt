@@ -1,0 +1,64 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/serial/gct,gdm7243-uart.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: GCT GDM7243 application CPU UART0-2
+
+maintainers:
+  - codeandsolder <codeandsolder@gmail.com>
+
+description: |
+  The application processor has three UARTs sharing the same register
+  layout, with TX at offset 0 and TX_FULL at status offset 0x14 bit 2.
+  A fourth UART has a different register layout and is not compatible.
+  The early console relies on the bootloader setting baud and clock.
+  Full receive/transmit and modem-control support comes from a
+  separate serial driver.
+
+properties:
+  compatible:
+    const: gct,gdm7243-uart
+
+  reg:
+    maxItems: 1
+
+  interrupts:
+    minItems: 2
+    maxItems: 2
+    description: Receive and transmit interrupt lines, respectively
+
+  interrupt-names:
+    items:
+      - const: rx
+      - const: tx
+
+  clocks:
+    maxItems: 1
+
+required:
+  - compatible
+  - reg
+  - interrupts
+  - interrupt-names
+  - clocks
+
+additionalProperties: false
+
+examples:
+  - |
+    bus_clock: clock-1x {
+        compatible = "fixed-clock";
+        #clock-cells = <0>;
+        clock-frequency = <104160000>;
+    };
+
+    serial@fc007500 {
+        compatible = "gct,gdm7243-uart";
+        reg = <0xfc007500 0x40>;
+        interrupts = <2>, <3>;
+        interrupt-names = "rx", "tx";
+        clocks = <&bus_clock>;
+    };
+...
