@@ -1,0 +1,41 @@
+# GCT GDM7243QT OpenWrt board support
+
+Clean-room Linux/OpenWrt port for the **Polish P4 ZTE WF830 ODU**,
+GCT GDM7243QT Cortex-A7 ARMv7 SoC.
+
+**Target distribution:** OpenWrt 25.12 / Linux 6.12.
+**Current stage:** first modern kernel drivers, using only firmware
+observations from the actual Polish P4 device.
+
+The `target/linux/gdm7243/files/` tree is a kernel source overlay,
+with the OpenWrt kernel integration patch in `patches-6.12/`.
+The buildable OpenWrt machine configuration and boot image format
+will be added as the RAM-only bootloader/endianness work is resolved.
+
+The driver work is independent from
+[wf830-redox](https://github.com/codeandsolder/wf830-redox),
+which owns the Rust modem control/userland stack.
+
+## Hardware evidence
+
+Real device: `/home/jan/projects/wf830/our-device/`.
+Corrected BE8 kernel symbol ELF:
+`/home/jan/research/wf830-202610/linux-mainline-20261118/live-p4-vmlinux-be8.symbols.elf`.
+
+All proprietary firmware, calibration, dumps and decompiler databases
+are deliberately excluded. Only source, declarative bindings and
+sanitized hardware notes belong in this repository.
+
+## Drivers
+
+- `drivers/irqchip/irq-gdm7243.c`: root IRQ controller,
+  64 lines/two banks, level handler, mask/ack and OEM priority.
+  Static recovery complete, hardware test pending.
+- `drivers/clocksource/gdm7243-rtccs.c`: free-running 32.768 kHz
+  RTC clocksource and scheduler clock, recovered from the live P4 kernel.
+  Static recovery complete, hardware test pending.
+- Next: periodic clockevent (IRQ 18), serial console, then GIPC/GLIF,
+  NAND/ECC and Ethernet.
+
+See [IRQ controller recovery](docs/irqchip.md) and
+[RTC clocksource recovery](docs/clocksource.md).

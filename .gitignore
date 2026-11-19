@@ -1,0 +1,14 @@
+# No tool output or build products belong in this source repository.
+*.o
+*.ko
+*.cmd
+*.dtb
+*.dtbo
+*.elf
+*.a
+*.so
+*.log
+*.tmp
+.config
+/build/
+/target/linux/gdm7243/tmp/

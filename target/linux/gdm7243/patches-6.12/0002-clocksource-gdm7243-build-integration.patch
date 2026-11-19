@@ -1,0 +1,30 @@
+diff --git a/drivers/clocksource/Kconfig b/drivers/clocksource/Kconfig
+index abfc2aa85..ab2e74de0 100644
+--- a/drivers/clocksource/Kconfig
++++ b/drivers/clocksource/Kconfig
+@@ -29,6 +29,15 @@ config OMAP_DM_SYSTIMER
+ config CLKBLD_I8253
+ 	def_bool y if CLKSRC_I8253 || CLKEVT_I8253 || I8253_LOCK
+ 
++config GDM7243_RTCCS
++	bool "GCT GDM7243 RTC clocksource"
++	depends on ARM && OF
++	select CLKSRC_MMIO
++	select TIMER_OF
++	help
++	  Always-on 32.768 kHz counter used as a clocksource and
++	  scheduler clock by the GCT GDM7243 application processor.
++
+ config CLKSRC_MMIO
+ 	bool
+ 
+diff --git a/drivers/clocksource/Makefile b/drivers/clocksource/Makefile
+index 227437852..71a84b274 100644
+--- a/drivers/clocksource/Makefile
++++ b/drivers/clocksource/Makefile
+@@ -1,4 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
++obj-$(CONFIG_GDM7243_RTCCS)		+= gdm7243-rtccs.o
+ obj-$(CONFIG_TIMER_OF)		+= timer-of.o
+ obj-$(CONFIG_TIMER_PROBE)	+= timer-probe.o
+ obj-$(CONFIG_ATMEL_PIT)		+= timer-atmel-pit.o

@@ -1,0 +1,3 @@
+# Git whitespace checks should apply to sources, not to the embedded
+# diff context/prefix lines of OpenWrt kernel patch artifacts.
+*.patch -whitespace

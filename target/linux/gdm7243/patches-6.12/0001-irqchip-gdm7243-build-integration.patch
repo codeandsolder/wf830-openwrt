@@ -1,0 +1,30 @@
+diff --git a/drivers/irqchip/Kconfig b/drivers/irqchip/Kconfig
+index 5d5b3cf38..63802b019 100644
+--- a/drivers/irqchip/Kconfig
++++ b/drivers/irqchip/Kconfig
+@@ -5,6 +5,14 @@ config IRQCHIP
+ 	def_bool y
+ 	depends on (OF_IRQ || ACPI_GENERIC_GSI)
+ 
++config GDM7243_IRQCHIP
++	bool "GCT GDM7243 root interrupt controller"
++	depends on ARM && OF
++	select IRQ_DOMAIN
++	help
++	  Interrupt controller for the application processor of GCT
++	  GDM7243 family LTE SoCs. It handles 64 level IRQs in two banks.
++
+ config ARM_GIC
+ 	bool
+ 	depends on OF
+diff --git a/drivers/irqchip/Makefile b/drivers/irqchip/Makefile
+index e3679ec2b..2e22fcb8d 100644
+--- a/drivers/irqchip/Makefile
++++ b/drivers/irqchip/Makefile
+@@ -1,5 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ obj-$(CONFIG_IRQCHIP)			+= irqchip.o
++obj-$(CONFIG_GDM7243_IRQCHIP)		+= irq-gdm7243.o
+ 
+ obj-$(CONFIG_AL_FIC)			+= irq-al-fic.o
+ obj-$(CONFIG_ALPINE_MSI)		+= irq-alpine-msi.o
