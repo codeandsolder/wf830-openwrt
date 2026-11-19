@@ -1,0 +1,29 @@
+diff --git a/drivers/clocksource/Kconfig b/drivers/clocksource/Kconfig
+--- a/drivers/clocksource/Kconfig
++++ b/drivers/clocksource/Kconfig
+@@ -217,6 +217,14 @@
+ 	depends on HAS_IOMEM
+ 	help
+ 	  Use the always on PRCMU Timer as clocksource.
++
++config GDM7243_TIMER
++	bool "GCT GDM7243 periodic clockevent timer"
++	depends on ARM && OF
++	select TIMER_OF
++	help
++	  GCT GDM7243 application CPU periodic clockevent generator.
++	  The hardware's proven clockevent operation is periodic only.
+ 
+ config CLPS711X_TIMER
+ 	bool "Cirrus Logic timer driver" if COMPILE_TEST
+diff --git a/drivers/clocksource/Makefile b/drivers/clocksource/Makefile
+--- a/drivers/clocksource/Makefile
++++ b/drivers/clocksource/Makefile
+@@ -29,6 +29,7 @@
+ obj-$(CONFIG_ARMADA_370_XP_TIMER)	+= timer-armada-370-xp.o
+ obj-$(CONFIG_ORION_TIMER)	+= timer-orion.o
+ obj-$(CONFIG_BCM2835_TIMER)	+= bcm2835_timer.o
++obj-$(CONFIG_GDM7243_TIMER)	+= gdm7243-timer.o
+ obj-$(CONFIG_CLPS711X_TIMER)	+= clps711x-timer.o
+ obj-$(CONFIG_MXS_TIMER)		+= mxs_timer.o
+ obj-$(CONFIG_CLKSRC_PXA)	+= timer-pxa.o

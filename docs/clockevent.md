@@ -21,28 +21,45 @@ stub. The real tick works because gdm_init_time configures periodic hardware
 before registering the clockevent. The live /proc/interrupts contains more
 than three million IRQ 18 events.
 
-## Implementation contract for the next driver
+## Linux 6.12 implementation
 
-The clockevent driver is not yet merged. The planned Linux 6.12
-**gdm7243 timer** should use TIMER_OF_DECLARE, the standard
-clockevents framework and the IRQ domain from irq-gdm7243.c.
+The clean-room driver lives at
+`target/linux/gdm7243/files/drivers/clocksource/gdm7243-timer.c`;
+the DT binding is
+`Documentation/devicetree/bindings/timer/gct,gdm7243-timer.yaml`.
+OpenWrt applies the Kconfig/Makefile integration as
+`0003-clockevent-gdm7243-build-integration.patch`.
 
-- Advertise only CLOCK_EVT_FEAT_PERIODIC until one-shot support is proven.
-- Require a **clocks** DT phandle for the actual *timers* clock rate.
-- Derive the reload from the current kernel HZ, not a fixed 1 kHz tick.
-- Shutdown must disable control bit 3; periodic setup uses control 0x2c.
-- The root IRQ controller supplies the verified mask/ack pulse. Confirm
-  whether the timer IP requires further local acknowledgement.
-- Keep all timer accesses separate from RTC, modem, NAND and storage.
+- Uses `TIMER_OF_DECLARE` and the standard Linux clockevents API.
+- Explicitly advertises **CLOCK_EVT_FEAT_PERIODIC only**; the
+  recovered OEM `set_next_event` is a logging stub, not a timer mode.
+- The mandatory **clocks** DT phandle supplies the actual
+  *timers* clock rate. The driver runs `clk_prepare_enable` and
+  derives reload by rounding `rate / HZ` to the nearest cycle,
+  then subtracting 1. Stock `HZ=1000` is not hardcoded.
+- The clockevent shutdown clears control **bit 3** while preserving
+  other bits, reproducing the OEM stop sequence; periodic setup writes
+  the reload register, then **0x2c** to the control register.
+- The root GDM7243 irqchip performs the observed hardware IRQ
+  mask/ack pulse; the timer ISR calls the Linux event handler.
+- There is no timer-level acknowledgement in the OEM handler;
+  it uses the 32.768 kHz RTC counter for latency instrumentation.
+- Resource errors unwind mapped IO, IRQ mapping and clock enabling.
+
+Kernel boot configuration must select **CONFIG_HZ_PERIODIC=y**,
+rather than tickless/high-resolution modes that require a supported
+one-shot clockevent. The clocksource is a separate 32.768 kHz counter.
 
 The boot log also prints **1x clock = 104160000 Hz**, but it does **not**
 establish this to be the effective *timers* clock rate. Recover the clock
 divider/PLL configuration rather than assuming that number.
 
-## Bring-up requirements
+## Board integration and validation
 
-Use a periodic-tick kernel configuration; dynamic tick and high-resolution
-clockevents require a verified one-shot source or another timer implementation.
+A future board DTS needs the exact actual `timers` clock provider and
+a parent interrupt controller mapping IRQ 18. The 1x clock logged by
+P4 is a clue, not justification for freezing a clock rate in the
+driver; future PLL changes need consideration.
 
 Hardware checks: register-level measurements against clock-source behavior,
 IRQ 18 delivery and acknowledgment, 1-second wall-clock drift with selected
