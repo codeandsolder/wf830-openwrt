@@ -38,7 +38,9 @@ sanitized hardware notes belong in this repository.
   output using the recovered UART0-2 register layout.
 - `drivers/gpio/gpio-gdm7243.c`: banked GPIO direction/input/output
   using standard gpiolib with explicit DT population count.
-- Next: periodic clockevent and full UART/clock control, then GIPC/GLIF,
+- `drivers/clocksource/gdm7243-timer.c`: IRQ 18 periodic Linux
+  clockevent, with OEM-observed control and clock-derived reload.
+- Next: full UART/clock control and GPIO IRQ domains, then GIPC/GLIF,
   NAND/ECC and Ethernet.
 
 See [IRQ controller recovery](docs/irqchip.md) and
