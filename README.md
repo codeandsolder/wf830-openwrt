@@ -39,3 +39,19 @@ sanitized hardware notes belong in this repository.
 
 See [IRQ controller recovery](docs/irqchip.md) and
 [RTC clocksource recovery](docs/clocksource.md).
+
+## Repeatable compiler validation
+
+Build just the ported drivers from a *clean* Linux 6.12 Git checkout
+(in an automatically removed temporary worktree), with the existing
+shared sccache instance and an external output directory:
+
+```sh
+tools/build-drivers.sh \
+  /home/jan/research/wf830-kernel-v6.12.87 \
+  /home/jan/build/wf830-linux-6.12/validate
+```
+
+No kernel/build artifacts are written into this repository. Device
+operation still needs a real OpenWrt GCT target, boot handoff and
+serial hardware testing.
