@@ -36,12 +36,16 @@ sanitized hardware notes belong in this repository.
   Static recovery complete, hardware test pending.
 - `drivers/tty/serial/gdm7243-earlycon.c`: polling boot-console
   output using the recovered UART0-2 register layout.
+- `drivers/gpio/gpio-gdm7243.c`: banked GPIO direction/input/output
+  using standard gpiolib with explicit DT population count.
 - Next: periodic clockevent and full UART/clock control, then GIPC/GLIF,
   NAND/ECC and Ethernet.
 
 See [IRQ controller recovery](docs/irqchip.md) and
 [RTC clocksource recovery](docs/clocksource.md), and
-[UART early-console recovery](docs/earlycon.md).
+[UART early-console recovery](docs/earlycon.md),
+[GPIO recovery](docs/gpio.md), and
+[periodic timer research](docs/clockevent.md).
 
 ## Repeatable compiler validation
 
