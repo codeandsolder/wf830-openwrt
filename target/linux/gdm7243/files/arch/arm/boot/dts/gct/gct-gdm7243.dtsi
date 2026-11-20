@@ -95,4 +95,13 @@
 		clocks = <&clocks GDM7243_CLK_UART1>;
 		status = "disabled";
 	};
+
+	uart2: serial@fc007580 {
+		compatible = "gct,gdm7243-uart";
+		reg = <0xfc007580 0x40>;
+		interrupts = <33>, <34>;
+		interrupt-names = "rx", "tx";
+		clocks = <&clocks GDM7243_CLK_UART2>;
+		status = "disabled";
+	};
 };

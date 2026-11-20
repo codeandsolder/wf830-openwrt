@@ -53,8 +53,10 @@ tools/build-ram-kernel.sh \
     /home/jan/build/wf830-linux-6.12/ram-boot
 ```
 
-This uses the OEM-observed ARMv7 application CPU target and
-enables all eight GCT drivers, `CONFIG_HZ_PERIODIC=y`,
+This uses `tools/ram-boot/bringup.config` as a minimal,
+source-controlled `KCONFIG_ALLCONFIG` seed instead of the enormous
+ARM multi-platform default configuration. It enables all eight
+GCT drivers, `CONFIG_HZ_PERIODIC=y`,
 `CONFIG_HZ_1000=y`, ARM appended-DTB support, Linux
 `/dev/console`, and an embedded initramfs. It forces the
 kernel command line to

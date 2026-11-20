@@ -47,17 +47,22 @@ be refined after memory ownership is reconstructed from both CPUs.
 | Periodic system tick | 0xfc006c40, 0x20 bytes | 18 | OEM `gdm_init_time` |
 | UART0 | 0xfc007500, 0x40 bytes | RX 2 / TX 3 | live P4 serial |
 | UART1 | 0xfc007540, 0x40 bytes | RX 21 / TX 22 | live P4 serial |
+| UART2 | 0xfc007580, 0x40 bytes | RX 33 / TX 34 | OEM platform-device resource table |
 
 The root interrupt controller has 64 sources and excludes IRQ19.
 The timer is **periodic only** in the observed OEM implementation
 and expects `CONFIG_HZ_PERIODIC=y`.
-UART0 and UART1 have independent RX/TX IRQs; UART1 is disabled
+UART0, UART1 and UART2 have independent RX/TX IRQs; UART1/2 are disabled
 in the first P4 board device tree until its use is explicitly needed.
 
-UART2 appears at 0xfc007580 with the first interrupt numbered 33
-in the OEM boot output, but its independent TX resource is not
-yet recovered. UART3 at 0xfc007600 uses a different hardware
-layout. Neither is enabled in the initial board DTS.
+The actual OEM BE8 kernel exports `gdm_uart2_device` via its
+`__ksymtab` entry at 0xd03e9638, resolving the platform device
+at 0xd04c9168. Its resource pointer at 0xd04c98c0 contains
+physical memory 0xfc007580..0xfc0075bf and two interrupts
+33 (RX) and 34 (TX). UART2 is represented in the SoC DTS
+with both root IRQs and remains disabled on the P4 board.
+UART3 (MMIO 0xfc007600, IRQ12) has a different register
+layout and is not assigned the UART0–2 compatible string.
 
 The original P4 Ethernet controller was logged at
 **0xec0c0000 / IRQ15** with RTL8211 PHY, and SDHCI at

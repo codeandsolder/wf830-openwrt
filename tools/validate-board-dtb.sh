@@ -45,8 +45,10 @@ fi
 [[ "$(fdtget -t x "$dtb" /gpio@fc002080 interrupts)" == "a 1d" ]]
 [[ "$(fdtget -t x "$dtb" /serial@fc007500 interrupts)" == "2 3" ]]
 [[ "$(fdtget -t x "$dtb" /serial@fc007540 interrupts)" == "15 16" ]]
+[[ "$(fdtget -t x "$dtb" /serial@fc007580 interrupts)" == "21 22" ]]
 [[ "$(fdtget -t s "$dtb" /serial@fc007500 status)" == "okay" ]]
 [[ "$(fdtget -t s "$dtb" /serial@fc007540 status)" == "disabled" ]]
+[[ "$(fdtget -t s "$dtb" /serial@fc007580 status)" == "disabled" ]]
 [[ "$(fdtget -t s "$dtb" /chosen stdout-path)" == "serial0:921600n8" ]]
 args="$(fdtget -t s "$dtb" /chosen bootargs)"
 [[ "$args" == *"rdinit=/init"* && "$args" == *"ttyGDM0"* ]]

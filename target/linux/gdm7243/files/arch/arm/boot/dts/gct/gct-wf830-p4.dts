@@ -36,6 +36,7 @@
 	aliases {
 		serial0 = &uart0;
 		serial1 = &uart1;
+		serial2 = &uart2;
 	};
 
 	chosen {
@@ -60,6 +61,11 @@
 		groups = "gpg-11-12";
 	};
 
+	uart2_default: uart2-pins {
+		function = "uart2";
+		groups = "gpg-13-14";
+	};
+
 	/* Reserved for a future RTL8211 Ethernet MAC driver. */
 	ethernet_rgmii: ethernet-pins {
 		function = "rgmii";
@@ -76,5 +82,11 @@
 &uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart1_default>;
+	status = "disabled";
+};
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart2_default>;
 	status = "disabled";
 };

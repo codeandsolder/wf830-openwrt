@@ -33,32 +33,19 @@ for patch in "$overlay"/patches-6.12/*.patch; do
 done
 cp -a "$overlay/files/." "$scratch/"
 
-make -s -j4 -C "$scratch" O="$output/kernel" ARCH=arm LLVM=1 \
-    CC="/usr/local/bin/sccache clang" multi_v7_defconfig
+# Keep the kernel boot build intentionally board-scoped; ARM multi_v7
+# defconfig includes hundreds of unrelated vendor drivers and sound stacks.
+# The source-controlled Kconfig seed is validated independently.
+KCONFIG_ALLCONFIG="$repo/tools/ram-boot/bringup.config" \
+    make -s -j4 -C "$scratch" O="$output/kernel" ARCH=arm LLVM=1 \
+    CC="/usr/local/bin/sccache clang" allnoconfig
 config="$output/kernel/.config"
-kconfig="$scratch/scripts/config"
-"$kconfig" --file "$config" \
-    -e GDM7243_IRQCHIP \
-    -e GDM7243_RTCCS \
-    -e GDM7243_TIMER \
-    -e GPIO_GDM7243 \
-    -e PINCTRL_GDM7243 \
-    -e CLK_GDM7243 \
-    -e SERIAL_GDM7243_EARLYCON \
-    -e SERIAL_GDM7243 \
-    -e SERIAL_GDM7243_CONSOLE \
-    -e HZ_PERIODIC -d NO_HZ_IDLE -d NO_HZ_FULL \
-    -e HZ_1000 -d HZ_100 -d HZ_250 -d HZ_300 \
-    -d SMP -d MODULES \
-    -e BLK_DEV_INITRD -e DEVTMPFS -e DEVTMPFS_MOUNT \
-    -e ARM_APPENDED_DTB -e ARM_ATAG_DTB_COMPAT \
-    -e CMDLINE_FORCE \
-    --set-str CMDLINE 'console=ttyGDM0,921600n8 earlycon nohz=off rdinit=/init loglevel=8' \
+"$scratch/scripts/config" --file "$config" \
     --set-str INITRAMFS_SOURCE "$output/initramfs/initramfs.cpio"
 
 make -s -j4 -C "$scratch" O="$output/kernel" ARCH=arm LLVM=1 \
     CC="/usr/local/bin/sccache clang" olddefconfig
-for item in GDM7243_IRQCHIP GDM7243_RTCCS GDM7243_TIMER GPIO_GDM7243 \
+for item in GPIOLIB_IRQCHIP GDM7243_IRQCHIP GDM7243_RTCCS GDM7243_TIMER GPIO_GDM7243 \
     PINCTRL_GDM7243 CLK_GDM7243 SERIAL_GDM7243 SERIAL_GDM7243_CONSOLE \
     SERIAL_GDM7243_EARLYCON HZ_PERIODIC HZ_1000 BLK_DEV_INITRD; do
     rg -q "^CONFIG_${item}=y$" "$config" || {

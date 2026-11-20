@@ -54,7 +54,7 @@ sanitized hardware notes belong in this repository.
   and normal GPIO pinctrl ownership/ranges.
 - `arch/arm/boot/dts/gct/gct-gdm7243.dtsi` and
   `gct-wf830-p4.dts`: physical SoC register nodes, confirmed P4
-  UART0/1 wiring, 80 MiB DDR and an 8 MiB modem-shared exclusion.
+  UART0/1/2 wiring, 80 MiB DDR and an 8 MiB modem-shared exclusion.
 - Next: verified BE8-to-LE RAM-only boot handoff, then GIPC/GLIF,
   NAND/ECC and Ethernet.
 
