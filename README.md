@@ -7,8 +7,9 @@ GCT GDM7243QT Cortex-A7 ARMv7 SoC.
 **Current stage:** eight Linux 6.12 GDM7243 kernel drivers plus
 a physical-register-based SoC DTS and Polish P4 board DTS. The DTB
 compiles through Linux Kbuild and has a complete schema validator.
-A separate RAM-only kernel+initramfs builder is available for
-reversible boot preparation, pending the proven BE8-to-LE handoff.
+A complete RAM-only `uImage` build now includes an ARMv7-A
+BE8-to-LE entry bridge, verified against the OEM P4 legacy
+image format. Physical serial/U-Boot boot testing is the next gate.
 
 The `target/linux/gdm7243/files/` tree is a kernel source overlay,
 with the OpenWrt kernel integration patch in `patches-6.12/`.
@@ -55,7 +56,9 @@ sanitized hardware notes belong in this repository.
 - `arch/arm/boot/dts/gct/gct-gdm7243.dtsi` and
   `gct-wf830-p4.dts`: physical SoC register nodes, confirmed P4
   UART0/1/2 wiring, 80 MiB DDR and an 8 MiB modem-shared exclusion.
-- Next: verified BE8-to-LE RAM-only boot handoff, then GIPC/GLIF,
+- `tools/ram-boot/be8-to-le.S`: fixed 256-byte BE8-to-LE
+  U-Boot `bootm` bridge and checked legacy uImage packager.
+- Next: serial RAM-only boot on the P4, then GIPC/GLIF,
   NAND/ECC and Ethernet.
 
 See [IRQ controller recovery](docs/irqchip.md) and
@@ -67,7 +70,8 @@ See [IRQ controller recovery](docs/irqchip.md) and
 [clock tree recovery](docs/clocks.md), and
 [pinmux register recovery](docs/pinctrl.md),
 [physical board model](docs/board.md), and
-[RAM-only boot preparation](docs/ram-boot.md).
+[RAM-only boot preparation](docs/ram-boot.md), and
+[BE8-to-LE U-Boot handoff](docs/boot-handoff.md).
 
 ## Repeatable compiler validation
 
@@ -88,10 +92,17 @@ Check its bindings, physical memory map and IRQ wiring with:
 tools/validate-board-dtb.sh     /home/jan/build/wf830-linux-6.12/validate/arch/arm/boot/dts/gct/gct-wf830-p4.dtb     /home/jan/research/wf830-kernel-v6.12.87
 ```
 
-Build a static ARM32 EABI bring-up initramfs, and optionally a
-full kernel and appended-DTB image, using
-`tools/build-ram-initramfs.sh` and `tools/build-ram-kernel.sh`.
+Build the static ARM32 EABI bring-up initramfs, full kernel
+and appended-DTB image with `tools/build-ram-kernel.sh`;
+`tools/build-ram-uimage.sh` then emits an OEM-compatible
+legacy ARM kernel image with a BE8-to-LE handoff stub.
+
+The resulting legacy image lives at
+`/home/jan/build/wf830-linux-6.12/boot-handoff/wf830-p4-le-ram.uImage`.
+Use `tools/build-ram-uimage.sh` to rebuild only the wrapper when
+the kernel+DTB already exist.
 
 No kernel/build artifacts are written into the Git repository.
-The original OEM CPU runs BE8; bootloader endian handoff and physical
-testing must be resolved before executing a little-endian zImage.
+The image format, endianness transition instructions and U-Boot
+header are statically verified; the first physical RAM-only
+boot and serial handoff remain to be tested.

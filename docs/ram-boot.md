@@ -69,9 +69,20 @@ so the OEM's `ubi.mtd=10`, `root=ubi0:rootfs` and
 NAND partition list do not become part of the test boot.
 
 Output includes the raw ARM `zImage`, the board `dtb`,
-and the combined `wf830-p4-zImage-appended-dtb`. These
-are **little-endian ARM kernel artifacts**, not a ready-to-run
-U-Boot `uImage` for a confirmed boot path.
+and the combined `wf830-p4-zImage-appended-dtb`.
+To package these as a normal **legacy U-Boot `uImage`**
+with a minimal **BE8-to-LE entry bridge**, run:
+
+```sh
+tools/build-ram-uimage.sh \
+    /home/jan/build/wf830-linux-6.12/ram-boot \
+    /home/jan/build/wf830-linux-6.12/boot-handoff
+```
+
+See [the verified P4 bootloader handoff](boot-handoff.md).
+The new image has an OEM-compatible header, load address,
+entry address and CRCs; an actual hardware boot is the
+remaining validation step.
 
 ## Hardware handoff facts to verify before using the artifact
 
@@ -86,12 +97,15 @@ instructions. The exact U-Boot `bootm` FDT argument support,
 memory overlap behavior and available RAM-only upload paths
 must be confirmed at the device console.
 
-Most importantly, the **stock P4 kernel is ARMv7 BE8**
-while this new Linux 6.12 driver and zImage build uses
-**ARMv7 little-endian**. A proven CPU endian transition
-at entry, and correct DTB/ATAG handoff, are mandatory before
-attempting to run the new kernel. Blindly invoking `bootm`
-on a LE zImage from a BE8 bootloader is not a boot test.
+The **stock P4 bootloader and kernel are ARMv7 BE8**,
+whereas this Linux 6.12 zImage is **little-endian**.
+The separate handoff wrapper performs `SETEND LE`, clears
+`SCTLR.EE`, resets ARM Linux boot registers, and branches
+to the unmodified zImage at payload offset `0x100`.
+The appended DTB is discovered by Linux itself. This is
+a complete, statically checked image preparation path.
+Its CPU handoff and UART console must still be verified
+on the real device.
 
 Bring-up milestones once a reversible entry path is verified:
 1. Load the image/DTB/initramfs entirely through RAM, without changing
