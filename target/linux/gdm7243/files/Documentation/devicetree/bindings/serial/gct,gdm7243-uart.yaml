@@ -14,8 +14,9 @@ description: |
   layout, with TX at offset 0 and TX_FULL at status offset 0x14 bit 2.
   A fourth UART has a different register layout and is not compatible.
   The early console relies on the bootloader setting baud and clock.
-  Full receive/transmit and modem-control support comes from a
-  separate serial driver.
+  The full serial driver supports receive, transmit, error flags,
+  framing, baud programming and a normal console. UART3 is separate.
+  GPIO-based RTS/CTS requires board-specific pad-mux integration.
 
 properties:
   compatible:
