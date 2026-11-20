@@ -62,6 +62,13 @@ properties:
   '#gpio-cells':
     const: 2
 
+  gpio-ranges:
+    maxItems: 1
+    description: |
+      All 224 IRQ-capable pinctrl offsets map identically to GPIO
+      offsets 0..223. Unbonded or unsupported pins must additionally
+      be excluded using gpio-reserved-ranges.
+
   ngpios:
     minimum: 1
     maximum: 512

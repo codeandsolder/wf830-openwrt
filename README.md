@@ -46,7 +46,10 @@ sanitized hardware notes belong in this repository.
 - `drivers/clk/clk-gdm7243.c`: early common-clock provider for five
   OEM root clocks plus all 27 peripheral entries, strap/PLL rate
   selection and the original gate/pulse transactions.
-- Next: SoC pinctrl and board DT, then GIPC/GLIF,
+- `drivers/pinctrl/pinctrl-gdm7243.c`: 63 pad mux groups with all
+  177 recovered mode options, 42 functions, shared-field arbitration
+  and normal GPIO pinctrl ownership/ranges.
+- Next: SoC/board DT and RAM-only kernel bootstrap, then GIPC/GLIF,
   NAND/ECC and Ethernet.
 
 See [IRQ controller recovery](docs/irqchip.md) and
@@ -55,7 +58,8 @@ See [IRQ controller recovery](docs/irqchip.md) and
 [full UART driver recovery](docs/uart.md),
 [GPIO recovery](docs/gpio.md),
 [periodic timer recovery](docs/clockevent.md), and
-[clock tree recovery](docs/clocks.md).
+[clock tree recovery](docs/clocks.md), and
+[pinmux register recovery](docs/pinctrl.md).
 
 ## Repeatable compiler validation
 
