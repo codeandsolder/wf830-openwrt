@@ -1,0 +1,92 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+/dts-v1/;
+
+#include "gct-gdm7243.dtsi"
+
+/ {
+	model = "ZTE WF830 outdoor LTE unit (Polish P4)";
+	compatible = "zte,wf830-p4", "gct,gdm7243";
+
+	/*
+	 * Live P4 kernel:
+	 *   mem_base = 0xd0000000, mem_size = 0x05000000 (80 MiB).
+	 */
+	memory@d0000000 {
+		device_type = "memory";
+		reg = <0xd0000000 0x05000000>;
+	};
+
+	/*
+	 * GIPC shared descriptors are live at d480b000/d4822800 and
+	 * modem/serial-flash staging was seen at d4a82380. Treat the
+	 * upper 8 MiB as shared with the separate baseband CPU until
+	 * ownership is reconstructed. Linux must not allocate pages here.
+	 */
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		baseband_shared: memory@d4800000 {
+			reg = <0xd4800000 0x00800000>;
+			no-map;
+		};
+	};
+
+	aliases {
+		serial0 = &uart0;
+		serial1 = &uart1;
+		serial2 = &uart2;
+	};
+
+	chosen {
+		stdout-path = "serial0:921600n8";
+		/*
+		 * Transient initramfs-only bring-up. No NAND/UBI root.
+		 * Use this only after a verified LE boot handoff.
+		 */
+		bootargs = "console=ttyGDM0,921600n8 earlycon nohz=off rdinit=/init loglevel=8";
+	};
+};
+
+&pinctrl {
+	uart0_default: uart0-pins {
+		function = "uart0";
+		groups = "gpg-9-10";
+	};
+
+	/* Confirmed by the OEM P4 UART1/GPG11-12 mux log. */
+	uart1_default: uart1-pins {
+		function = "uart1";
+		groups = "gpg-11-12";
+	};
+
+	uart2_default: uart2-pins {
+		function = "uart2";
+		groups = "gpg-13-14";
+	};
+
+	/* Reserved for a future RTL8211 Ethernet MAC driver. */
+	ethernet_rgmii: ethernet-pins {
+		function = "rgmii";
+		groups = "gpe-0-10", "gpe-12-15";
+	};
+};
+
+&uart0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart0_default>;
+	status = "okay";
+};
+
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart1_default>;
+	status = "disabled";
+};
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart2_default>;
+	status = "disabled";
+};

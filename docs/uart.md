@@ -26,10 +26,26 @@ The original RX handler reads error register +0x04, writes the same
 word back to acknowledge it and consumes the data at +0x00. Error
 flags are bit0 frame, bit1 parity, bit2 break, bit3 overrun.
 
-Known physical ports: UART0 at 0xfc007500 (RX IRQ2, TX IRQ3),
-UART1 at 0xfc007540 (RX IRQ21, TX IRQ22), UART2 at 0xfc007580
-(IRQ routing requires independent recovery). UART3 at 0xfc007600
-is a different register architecture.
+Actual OEM platform-device memory/IRQ resources (extracted from
+big-endian ARMv7 P4 kernel data, not inferred from UART instance IDs):
+
+| Device | Resource descriptor | Physical MMIO | RX IRQ | TX IRQ |
+| --- | --- | --- | --- | --- |
+| UART0 | 0xd04c9930 | 0xfc007500–0xfc00753f | 2 | 3 |
+| UART1 | 0xd04c98f8 | 0xfc007540–0xfc00757f | 21 | 22 |
+| UART2 | 0xd04c98c0 | 0xfc007580–0xfc0075bf | 33 | 34 |
+| UART3 (incompatible) | 0xd04c9888 | 0xfc007600–0xfc00765f | 12 | same IRQ12 |
+
+The source exports `gdm_uart0_device`.. `gdm_uart3_device`
+through kernel symbol-table entries starting at 0xd03e9628,
+with device pointers at 0xd04c9348, 0xd04c9258,
+0xd04c9168 and 0xd04c9078. Each platform device's resource
+array starts at the pointer in its +0xe4 field. Resource
+records use 28-byte strides, with the MMIO or IRQ start/end
+and flags. UART2's RX33/TX34 are therefore independently
+verified; the generic serial driver now has complete hardware
+resources for its three supported ports. UART3 uses a
+different register architecture and is not compatible.
 
 ## Linux implementation
 
