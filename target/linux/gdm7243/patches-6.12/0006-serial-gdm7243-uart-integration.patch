@@ -1,0 +1,37 @@
+diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
+--- a/drivers/tty/serial/Kconfig
++++ b/drivers/tty/serial/Kconfig
+@@ -1574,6 +1574,22 @@
+ 	  but you can alter that using a kernel command line option such as
+ 	  "console=ttyNVTx".
+ 
++config SERIAL_GDM7243
++	bool "GCT GDM7243 UART0-2 serial controller"
++	depends on ARM && OF
++	select SERIAL_CORE
++	help
++	  Interrupt-driven serial support for the three standard-layout
++	  UARTs in the GCT GDM7243 application processor. UART3 has a
++	  different register layout and is not handled by this driver.
++
++config SERIAL_GDM7243_CONSOLE
++	bool "GCT GDM7243 serial console support"
++	depends on SERIAL_GDM7243=y
++	select SERIAL_CORE_CONSOLE
++	help
++	  Enable a regular ttyGDM console after early serial boot output.
++
+ config SERIAL_ESP32
+ 	tristate "Espressif ESP32 UART support"
+ 	depends on XTENSA_PLATFORM_ESP32 || (COMPILE_TEST && OF)
+diff --git a/drivers/tty/serial/Makefile b/drivers/tty/serial/Makefile
+--- a/drivers/tty/serial/Makefile
++++ b/drivers/tty/serial/Makefile
+@@ -37,6 +37,7 @@
+ obj-$(CONFIG_SERIAL_CPM)		+= cpm_uart.o
+ obj-$(CONFIG_SERIAL_CONEXANT_DIGICOLOR)	+= digicolor-usart.o
+ obj-$(CONFIG_SERIAL_DZ)			+= dz.o
++obj-$(CONFIG_SERIAL_GDM7243)		+= gdm7243-uart.o
+ obj-$(CONFIG_SERIAL_ESP32)		+= esp32_uart.o
+ obj-$(CONFIG_SERIAL_ESP32_ACM)		+= esp32_acm.o
+ obj-$(CONFIG_SERIAL_FSL_LINFLEXUART)	+= fsl_linflexuart.o
