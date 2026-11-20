@@ -39,16 +39,16 @@ additionalProperties: false
 
 examples:
   - |
-    timer_clock: clock-timer {
-        compatible = "fixed-clock";
-        #clock-cells = <0>;
-        clock-frequency = <104160000>;
+    clocks: clock-controller@fc000000 {
+        compatible = "gct,gdm7243-clocks";
+        reg = <0xfc000000 0x500>;
+        #clock-cells = <1>;
     };
 
     timer@fc006c40 {
         compatible = "gct,gdm7243-timer";
         reg = <0xfc006c40 0x20>;
         interrupts = <18>;
-        clocks = <&timer_clock>;
+        clocks = <&clocks 7>;
     };
 ...
