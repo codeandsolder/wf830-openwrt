@@ -39,11 +39,11 @@ sanitized hardware notes belong in this repository.
 - `drivers/tty/serial/gdm7243-uart.c`: UART0-2 serial-core
   driver, separate RX/TX IRQs, error reporting, baud/divisor and
   framing, ttyGDM devices and optional normal console.
-- `drivers/gpio/gpio-gdm7243.c`: banked GPIO direction/input/output
-  using standard gpiolib with explicit DT population count.
+- `drivers/gpio/gpio-gdm7243.c`: banked gpiolib direction/input/output
+  with dual-parent IRQ10/29 gpio-irqchip and board-defined IRQ routing.
 - `drivers/clocksource/gdm7243-timer.c`: IRQ 18 periodic Linux
   clockevent, with OEM-observed control and clock-derived reload.
-- Next: GPIO IRQ domains and SoC clocks/pinctrl, then GIPC/GLIF,
+- Next: SoC clocks/pinctrl and board DT, then GIPC/GLIF,
   NAND/ECC and Ethernet.
 
 See [IRQ controller recovery](docs/irqchip.md) and

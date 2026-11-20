@@ -35,13 +35,59 @@ any additional populated banks must be established by board data.
   the standard GPIO bindings; the physical pad population remains to be
   checked against board initialization.
 
-The gpio parent interrupt handling is a distinct hardware function:
-the original kernel uses **IRQ 10 and IRQ 29** for two GPIO interrupt
-channels, with separate per-bank mask/polarity/status registers.
-The gpiolib GPIO controller here does not invent a single-parent
-IRQ mapping or let the old raw character driver leak into the kernel
-API; GPIO IRQ-domain integration needs correct dual-parent routing,
-per-bank clear sequencing and pinmux ownership.
+## Two-parent GPIO IRQ chip
+
+The original kernel exposes **root hardware IRQ 10 (GPIO0)** and
+**IRQ 29 (GPIO1)**. Both can monitor banks 0..6, with independent masks
+and per-pin pending registers, but with common mode/polarity words:
+
+| Function | GPIO0 physical | GPIO1 physical |
+| --- | --- | --- |
+| Per-bank IRQ mask (RMW) | 0xfc002240 + bank*4 | 0xfc002280 + bank*4 |
+| Per-bank pending (W1C) | 0xfc002340 + bank*4 | 0xfc002380 + bank*4 |
+| Bank pending summary (W1C) | 0xfc002184 | 0xfc002188 |
+
+Shared mode at **0xfc002100 + bank*4**, polarity at
+**0xfc002140 + bank*4**. The OEM `request_gpio{0,1}_irq`
+set mode bit for low-nibble 0 (level) and cleared it for nonzero
+(edge). Polarity bit was set when the high nibble of the request
+flags equaled 0x10 (active high). We translate these cases to
+Linux level-high/low and edge-rising/falling; both-edge behavior
+requires OEM GPIO0's additional sample/polarity dance and is not
+advertised yet.
+
+The per-channel mask helpers `mask_gpio0_irq` at 0xd0019bcc and
+`mask_gpio1_irq` at 0xd0019b68 preserve other mask bits and update
+one bit at a time. `gpio_intr_ismine` at 0xd0019490 verifies the
+bank's summary bit and individual per-pin pending bit for the
+correct channel. `gpio_clear_interrupt` at 0xd0019558 snapshots and
+acks all seven W1C pending words followed by the bank summary word.
+
+The modern driver uses a normal gpiolib irqchip and two chained
+parent IRQ handlers. Every parent callback snapshots pending banks,
+clears pending words then acknowledges the bank summary, and routes
+only enabled lines on that channel to the Linux child IRQ domain.
+The gpiolib valid IRQ mask excludes GPIO lines >= 224 even if the
+full data controller exposes more banks.
+
+**Two separate channels can interrupt for the same physical pin,
+but Linux gpiolib associates one IRQ with one GPIO line.** The
+board-fixed seven-word `gct,irq1-mask` property assigns each line's
+IRQ to GPIO1 where bit=1, or GPIO0 otherwise. Both channels are
+requested, independent of whether some banks have no pins assigned.
+The driver never changes this routing while running. GPIO inputs
+that should not produce interrupts should use pinctrl or
+`gpio-reserved-ranges` and be left masked.
+
+The MMIO region needs at least **0x320 bytes from 0xfc002080**
+to cover the GPIO1 bank6 pending word at 0xfc002398. The former
+0x80-byte sample region only covered GPIO direction/data.
+
+Pinmux and actual board pin population remain the responsibility of
+a separate pinctrl/pad driver and board DT. The new parent/child
+irqdomain mechanism is compile validated only; pending semantics,
+mask polarity, level and edge behavior and concurrent acknowledgements
+should be verified on the device with a RAM-only kernel boot.
 
 ## Deployment
 

@@ -16,7 +16,11 @@ description: |
   Modern Linux uses contiguous GPIO offsets bank*32 + bit instead.
   The direction/data arrays can address at most 16 banks before
   the next register group. The vendor GPIO interrupt helpers support
-  only banks 0 through 6; this binding controls GPIO data access only.
+  only banks 0 through 6. Two independently maskable interrupt channels
+  share mode and polarity registers; their bank-level summaries, masks,
+  and pending bits occupy later registers in the same MMIO aperture.
+  Each GPIO IRQ line is bound to exactly one interrupt channel by
+  the fixed board routing property gct,irq1-mask.
 
 properties:
   compatible:
@@ -24,6 +28,34 @@ properties:
 
   reg:
     maxItems: 1
+
+  interrupts:
+    minItems: 2
+    maxItems: 2
+
+  interrupt-names:
+    items:
+      - const: gpio0
+      - const: gpio1
+
+  interrupt-controller: true
+
+  '#interrupt-cells':
+    const: 2
+
+  gct,irq1-mask:
+    description: |
+      Seven 32-bit words, one per interrupt-capable GPIO bank (0-6).
+      A set bit routes that pin's interrupt to GPIO1 (parent IRQ 29);
+      a clear bit routes it to GPIO0 (parent IRQ 10). This fixes the
+      route for the lifetime of the GPIO chip; no hardware route mux
+      is required because each pin has separate enable masks for both
+      channels.
+    minItems: 7
+    maxItems: 7
+    items:
+      minimum: 0
+      maximum: 4294967295
 
   gpio-controller: true
 
@@ -44,6 +76,10 @@ required:
   - gpio-controller
   - '#gpio-cells'
   - ngpios
+  - interrupts
+  - interrupt-names
+  - interrupt-controller
+  - '#interrupt-cells'
 
 allOf:
   - $ref: /schemas/gpio/gpio.yaml#
@@ -54,9 +90,14 @@ examples:
   - |
     gpio@fc002080 {
         compatible = "gct,gdm7243-gpio";
-        reg = <0xfc002080 0x80>;
+        reg = <0xfc002080 0x320>;
+        interrupts = <10>, <29>;
+        interrupt-names = "gpio0", "gpio1";
         gpio-controller;
         #gpio-cells = <2>;
+        interrupt-controller;
+        #interrupt-cells = <2>;
         ngpios = <224>;
+        gct,irq1-mask = <0 0 0 0 0 0 0>;
     };
 ...
