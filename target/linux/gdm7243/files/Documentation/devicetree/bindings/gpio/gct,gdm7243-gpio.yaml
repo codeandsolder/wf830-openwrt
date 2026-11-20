@@ -44,6 +44,7 @@ properties:
     const: 2
 
   gct,irq1-mask:
+    $ref: /schemas/types.yaml#/definitions/uint32-array
     description: |
       Seven 32-bit words, one per interrupt-capable GPIO bank (0-6).
       A set bit routes that pin's interrupt to GPIO1 (parent IRQ 29);

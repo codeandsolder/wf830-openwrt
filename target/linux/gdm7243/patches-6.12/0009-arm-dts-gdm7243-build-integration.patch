@@ -1,0 +1,11 @@
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -13,6 +13,7 @@
+ subdir-y += cirrus
+ subdir-y += cnxt
+ subdir-y += gemini
++subdir-y += gct
+ subdir-y += hisilicon
+ subdir-y += hpe
+ subdir-y += intel

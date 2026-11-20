@@ -1,0 +1,98 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+/*
+ * GCT GDM7243QT Cortex-A7 application processor.
+ *
+ * Recovered from the actual Polish P4 BE8 kernel: only physically
+ * verified MMIO and interrupt mappings are described.
+ */
+#include <dt-bindings/clock/gct,gdm7243.h>
+
+/ {
+	compatible = "gct,gdm7243";
+	#address-cells = <1>;
+	#size-cells = <1>;
+	interrupt-parent = <&intc>;
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <0>;
+		};
+	};
+
+	clocks: clock-controller@fc000000 {
+		compatible = "gct,gdm7243-clocks";
+		reg = <0xfc000000 0x500>;
+		#clock-cells = <1>;
+	};
+
+	pinctrl: pinctrl@fc000500 {
+		compatible = "gct,gdm7243-pinctrl";
+		reg = <0xfc000500 0x1c>;
+	};
+
+	rtccs: timer@fc000600 {
+		compatible = "gct,gdm7243-rtccs";
+		reg = <0xfc000600 0x20>;
+		clock-frequency = <32768>;
+	};
+
+	gpio: gpio@fc002080 {
+		compatible = "gct,gdm7243-gpio";
+		reg = <0xfc002080 0x320>;
+		interrupts = <10>, <29>;
+		interrupt-names = "gpio0", "gpio1";
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		ngpios = <224>;
+		/* Same 0..223 pin numbering as the modern gpiolib port. */
+		gpio-ranges = <&pinctrl 0 0 224>;
+		/* Only the original OEM 131 muxable pins are selectable. */
+		gpio-reserved-ranges = <8 24>, <46 18>, <81 15>,
+				       <120 8>, <145 15>, <184 8>,
+				       <219 5>;
+		/*
+		 * Each pin has one Linux child IRQ. Route all through
+		 * GPIO0 initially; the board must confirm any GPIO1 users.
+		 */
+		gct,irq1-mask = <0 0 0 0 0 0 0>;
+	};
+
+	intc: interrupt-controller@fc002c00 {
+		compatible = "gct,gdm7243-intc";
+		reg = <0xfc002c00 0x60>;
+		interrupt-controller;
+		#interrupt-cells = <1>;
+	};
+
+	timer0: timer@fc006c40 {
+		compatible = "gct,gdm7243-timer";
+		reg = <0xfc006c40 0x20>;
+		interrupts = <18>;
+		clocks = <&clocks GDM7243_CLK_TIMERS>;
+	};
+
+	uart0: serial@fc007500 {
+		compatible = "gct,gdm7243-uart";
+		reg = <0xfc007500 0x40>;
+		interrupts = <2>, <3>;
+		interrupt-names = "rx", "tx";
+		clocks = <&clocks GDM7243_CLK_UART0>;
+		status = "disabled";
+	};
+
+	uart1: serial@fc007540 {
+		compatible = "gct,gdm7243-uart";
+		reg = <0xfc007540 0x40>;
+		interrupts = <21>, <22>;
+		interrupt-names = "rx", "tx";
+		clocks = <&clocks GDM7243_CLK_UART1>;
+		status = "disabled";
+	};
+};

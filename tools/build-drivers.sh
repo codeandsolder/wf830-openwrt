@@ -64,3 +64,11 @@ make -s -j4 -C "$scratch" O="$output" ARCH=arm LLVM=1 \
 for object in "${objects[@]}"; do
     file "$output/$object"
 done
+# Validate the board DTB along with the kernel driver objects when present.
+board_dts="$overlay/files/arch/arm/boot/dts/gct/gct-wf830-p4.dts"
+if [[ -f "$board_dts" ]]; then
+    dtb="gct/gct-wf830-p4.dtb"
+    make -s -j4 -C "$scratch" O="$output" ARCH=arm LLVM=1 CC="/usr/local/bin/sccache clang" W=1 "$dtb"
+    test -s "$output/arch/arm/boot/dts/$dtb"
+    file "$output/arch/arm/boot/dts/$dtb"
+fi
