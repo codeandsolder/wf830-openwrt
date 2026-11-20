@@ -1,0 +1,41 @@
+/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
+#ifndef _DT_BINDINGS_CLOCK_GCT_GDM7243_H
+#define _DT_BINDINGS_CLOCK_GCT_GDM7243_H
+
+/* The order matches the OEM P4 kernel clock registration tables. */
+#define GDM7243_CLK_XTAL		0
+#define GDM7243_CLK_PLL			1
+#define GDM7243_CLK_ARM			2
+#define GDM7243_CLK_1X			3
+#define GDM7243_CLK_2X			4
+#define GDM7243_CLK_UDC			5
+#define GDM7243_CLK_UDC_40M		6
+#define GDM7243_CLK_TIMERS		7
+#define GDM7243_CLK_UART0		8
+#define GDM7243_CLK_UART1		9
+#define GDM7243_CLK_UART2		10
+#define GDM7243_CLK_UART3		11
+#define GDM7243_CLK_XTAL_32K		12
+#define GDM7243_CLK_WLAN		13
+#define GDM7243_CLK_I2S			14
+#define GDM7243_CLK_PCM			15
+#define GDM7243_CLK_ETH0		16
+#define GDM7243_CLK_ETH1		17
+#define GDM7243_CLK_USIM		18
+#define GDM7243_CLK_SDDEV		19
+#define GDM7243_CLK_SDHOST0		20
+#define GDM7243_CLK_SDHOST1		21
+#define GDM7243_CLK_GSH			22
+#define GDM7243_CLK_NAND		23
+#define GDM7243_CLK_PD_SLV		24
+#define GDM7243_CLK_PU			25
+#define GDM7243_CLK_PUR			26
+#define GDM7243_CLK_PD_USB		27
+#define GDM7243_CLK_I2C			28
+#define GDM7243_CLK_UH			29
+#define GDM7243_CLK_UHB			30
+#define GDM7243_CLK_SPI			31
+
+#define GDM7243_CLK_COUNT		32
+
+#endif

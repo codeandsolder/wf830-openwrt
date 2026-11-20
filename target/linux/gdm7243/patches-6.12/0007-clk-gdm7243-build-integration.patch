@@ -1,0 +1,28 @@
+diff --git a/drivers/clk/Kconfig b/drivers/clk/Kconfig
+--- a/drivers/clk/Kconfig
++++ b/drivers/clk/Kconfig
+@@ -32,6 +32,13 @@
+ 	  this option.
+ 
+ if COMMON_CLK
++
++config CLK_GDM7243
++	bool "GCT GDM7243QT system clock controller"
++	depends on ARM && OF
++	help
++	  Common clock framework provider for the GCT GDM7243
++	  application CPU root clocks and all 27 peripheral gates.
+ 
+ config COMMON_CLK_WM831X
+ 	tristate "Clock driver for WM831x/2x PMICs"
+diff --git a/drivers/clk/Makefile b/drivers/clk/Makefile
+--- a/drivers/clk/Makefile
++++ b/drivers/clk/Makefile
+@@ -45,6 +45,7 @@
+ obj-$(CONFIG_COMMON_CLK_FIXED_MMIO)	+= clk-fixed-mmio.o
+ obj-$(CONFIG_COMMON_CLK_FSL_FLEXSPI)	+= clk-fsl-flexspi.o
+ obj-$(CONFIG_COMMON_CLK_FSL_SAI)	+= clk-fsl-sai.o
++obj-$(CONFIG_CLK_GDM7243)		+= clk-gdm7243.o
+ obj-$(CONFIG_COMMON_CLK_GEMINI)		+= clk-gemini.o
+ obj-$(CONFIG_COMMON_CLK_ASPEED)		+= clk-aspeed.o
+ obj-$(CONFIG_MACH_ASPEED_G6)		+= clk-ast2600.o

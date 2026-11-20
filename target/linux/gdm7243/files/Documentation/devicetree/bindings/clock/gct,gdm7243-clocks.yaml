@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/clock/gct,gdm7243-clocks.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: GCT GDM7243QT application-CPU clock controller
+
+maintainers:
+  - codeandsolder <codeandsolder@gmail.com>
+
+description: |
+  Five root clocks and 27 peripheral entries. Root rates are derived
+  from bootloader-provided strap and PLL values. All original gate
+  bits are represented, including zero-rate peripherals whose parent
+  clocks have not yet been identified.
+  IDs are defined in dt-bindings/clock/gct,gdm7243.h.
+
+properties:
+  compatible:
+    const: gct,gdm7243-clocks
+
+  reg:
+    maxItems: 1
+    description: |
+      SoC clock/power configuration register block including gate
+      registers at offsets 0x40c, 0x438 and 0x43c and transaction
+      lock registers at 0x10 and 0x18. At least 0x490 bytes.
+
+  '#clock-cells':
+    const: 1
+
+required:
+  - compatible
+  - reg
+  - '#clock-cells'
+
+additionalProperties: false
+
+examples:
+  - |
+    clock-controller@fc000000 {
+        compatible = "gct,gdm7243-clocks";
+        reg = <0xfc000000 0x500>;
+        #clock-cells = <1>;
+    };
+...

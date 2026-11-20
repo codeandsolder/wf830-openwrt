@@ -43,15 +43,19 @@ sanitized hardware notes belong in this repository.
   with dual-parent IRQ10/29 gpio-irqchip and board-defined IRQ routing.
 - `drivers/clocksource/gdm7243-timer.c`: IRQ 18 periodic Linux
   clockevent, with OEM-observed control and clock-derived reload.
-- Next: SoC clocks/pinctrl and board DT, then GIPC/GLIF,
+- `drivers/clk/clk-gdm7243.c`: early common-clock provider for five
+  OEM root clocks plus all 27 peripheral entries, strap/PLL rate
+  selection and the original gate/pulse transactions.
+- Next: SoC pinctrl and board DT, then GIPC/GLIF,
   NAND/ECC and Ethernet.
 
 See [IRQ controller recovery](docs/irqchip.md) and
 [RTC clocksource recovery](docs/clocksource.md), and
 [UART early-console recovery](docs/earlycon.md),
 [full UART driver recovery](docs/uart.md),
-[GPIO recovery](docs/gpio.md), and
-[periodic timer research](docs/clockevent.md).
+[GPIO recovery](docs/gpio.md),
+[periodic timer recovery](docs/clockevent.md), and
+[clock tree recovery](docs/clocks.md).
 
 ## Repeatable compiler validation
 

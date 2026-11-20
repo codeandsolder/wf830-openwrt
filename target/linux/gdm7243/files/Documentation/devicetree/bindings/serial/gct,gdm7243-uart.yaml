@@ -49,10 +49,10 @@ additionalProperties: false
 
 examples:
   - |
-    bus_clock: clock-1x {
-        compatible = "fixed-clock";
-        #clock-cells = <0>;
-        clock-frequency = <104160000>;
+    clocks: clock-controller@fc000000 {
+        compatible = "gct,gdm7243-clocks";
+        reg = <0xfc000000 0x500>;
+        #clock-cells = <1>;
     };
 
     serial@fc007500 {
@@ -60,6 +60,6 @@ examples:
         reg = <0xfc007500 0x40>;
         interrupts = <2>, <3>;
         interrupt-names = "rx", "tx";
-        clocks = <&bus_clock>;
+        clocks = <&clocks 8>;
     };
 ...
